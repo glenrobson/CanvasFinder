@@ -5,3 +5,5 @@ This tool allows you to paste a IIIF Manifest URL into the box below and it will
 If there are lots of canvases in the manifest you are using you can use the filter box to start typing the label of the canvas you are interested in.
 
 {% include canvas_finder.html %}
+
+You can find Manifests using the [IIIF Guide](https://guides.iiif.io/finding_resources/).
