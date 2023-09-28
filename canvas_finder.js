@@ -4,6 +4,7 @@ function loadManifest(event) {
     let manifest_uri = document.getElementById('manifest_uri').value;
     
     let target_div = document.getElementById('manifest_content');
+    target_div.innerHTML = '';
 
     if (manifestOK(manifest_uri, target_div)) {
         fetch(manifest_uri)
@@ -181,70 +182,87 @@ function loadv2(manifest, target_div) {
 }
 
 function loadv3(manifest, target_div) {
-     if ('items' in manifest) {
-        let canvases = manifest.items;
-        let foundCanvas = false;
-        let filterDiv = document.createElement('div');
-        filterDiv.style="display: flex; justify-content: flex-end; padding-top: 5px; padding-bottom: 5px;"
-        filterDiv.innerHTML = '<label for="filter"><b>Filter: </b></label>';
+    if ('items' in manifest) {
+       let canvases = manifest.items;
+       let foundCanvas = false;
+       let filterDiv = document.createElement('div');
+       filterDiv.style="display: flex; justify-content: flex-end; padding-top: 5px; padding-bottom: 5px;"
+       filterDiv.innerHTML = '<label for="filter"><b>Filter: </b></label>';
 
-        let textBox = document.createElement('input');
-        textBox.style = "margin-left:10px;";
-        textBox.id = 'filter';
-        textBox.type="text";
-        textBox.placeholder="Filter canvas label";
-        textBox.addEventListener('input',filter);
-        filterDiv.appendChild(textBox);
-        target_div.appendChild(filterDiv);
+       let textBox = document.createElement('input');
+       textBox.style = "margin-left:10px;";
+       textBox.id = 'filter';
+       textBox.type="text";
+       textBox.placeholder="Filter canvas label";
+       textBox.addEventListener('input',filter);
+       filterDiv.appendChild(textBox);
+       target_div.appendChild(filterDiv);
 
-        let canvasLabel = "";
-        foundCanvas = true;
-        for (const canvas of canvases) {
-            let canvasDiv = document.createElement('div');
-            canvasDiv.style = "border: 1px black solid; padding: 5px;margin-top: 5px;";
-            canvasDiv.className = 'canvasDiv';
-            canvasLabel = getLangString(canvas.label);
-            canvasDiv.dataset.label = canvasLabel; 
+       let canvasLabel = "";
+       foundCanvas = true;
+       for (const canvas of canvases) {
+           let canvasDiv = document.createElement('div');
+           canvasDiv.style = "border: 1px black solid; padding: 5px;margin-top: 5px;";
+           canvasDiv.className = 'canvasDiv';
+           canvasLabel = VaultHelpers.getValue(canvas.label);
+           canvasDiv.dataset.label = canvasLabel; 
 
-            let thumbnail = document.createElement('img');
-            thumbnail.src = getCanvasThumbnail(canvas, 150,150);
-            thumbnail.className = 'thumbnail';
-            let thumbDiv = document.createElement('div');
-            thumbDiv.style="display: inline-block;";
-            thumbDiv.appendChild(thumbnail);
+           let thumbnail = document.createElement('img');
+           const helper = VaultHelpers.createThumbnailHelper();
 
-            let contentDiv = document.createElement('div');
-            contentDiv.style="width: 70%; display: inline-block;position: relative; padding-left: 20px;"
-            let label = document.createElement('p');
-            label.innerHTML = '<b>Page Label: </b>' + canvasLabel; 
+           helper.getBestThumbnailAtSize(canvas, {
+                    width: 150,
+                    height: 150
+                    })
+                    .then((thumb) => {
+                    if (thumb.best) {
+                        // Render it out.
+                        thumbnail.src = thumb.best.id;
+                    }
+                    });
+           thumbnail.className = 'thumbnail';
+           let thumbDiv = document.createElement('div');
+           thumbDiv.style="display: inline-block;";
+           thumbDiv.appendChild(thumbnail);
 
-            var iiifURL = canvas.items[0].items[0].body.service[0]["@id"];
+           let contentDiv = document.createElement('div');
+           contentDiv.style="width: 70%; display: inline-block;position: relative; padding-left: 20px;"
+           let label = document.createElement('p');
+           label.innerHTML = '<b>Page Label: </b>' + canvasLabel; 
+           
+           let service = canvas.items[0].items[0].body.service[0];
+           var iiifURL = '';
+           if ('@id' in service) {
+               iiifURL = service["@id"];
+           } else {
+               iiifURL = service.id;
+           } 
 
-            let link = document.createElement('a');
-            link.href = iiifURL;
-            link.innerHTML = iiifURL;
+           let link = document.createElement('a');
+           link.href = iiifURL;
+           link.innerHTML = iiifURL;
 
-            let pLink = document.createElement('p');
-            pLink.innerHTML = '<b>IIIF Image URL: </b><br/>';
-            pLink.appendChild(link);
+           let pLink = document.createElement('p');
+           pLink.innerHTML = '<b>IIIF Image URL: </b><br/>';
+           pLink.appendChild(link);
 
-            let button = document.createElement('button');
-            button.style = "cursor: pointer; background-color: #0069d9; color: #fff; border-color: #0062cc; font-weight: 400; text-align: center; vertical-align: middle; user-select: none; border: 1px solid transparent; padding: .375rem .75rem; line-height: 1.5; border-radius: .25rem; transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; -webkit-appearance: button;text-transform: none; overflow: visible; margin: 0; font-family: inherit;box-sizing: border-box; ";
-            button.innerHTML = '<i class="fas fa-copy"></i> Copy Image URL';       
-            button.addEventListener('click', copyURL);
-            button.dataset.link = link;
+           let button = document.createElement('button');
+           button.style = "cursor: pointer; background-color: #0069d9; color: #fff; border-color: #0062cc; font-weight: 400; text-align: center; vertical-align: middle; user-select: none; border: 1px solid transparent; padding: .375rem .75rem; line-height: 1.5; border-radius: .25rem; transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; -webkit-appearance: button;text-transform: none; overflow: visible; margin: 0; font-family: inherit;box-sizing: border-box; ";
+           button.innerHTML = '<i class="fas fa-copy"></i> Copy Image URL';       
+           button.addEventListener('click', copyURL);
+           button.dataset.link = link;
 
-            contentDiv.appendChild(label);
-            contentDiv.appendChild(pLink);
-            contentDiv.appendChild(button);
-            canvasDiv.appendChild(thumbDiv);
-            canvasDiv.appendChild(contentDiv);
+           contentDiv.appendChild(label);
+           contentDiv.appendChild(pLink);
+           contentDiv.appendChild(button);
+           canvasDiv.appendChild(thumbDiv);
+           canvasDiv.appendChild(contentDiv);
 
-            target_div.appendChild(canvasDiv);
-        }
-    } else {
-        showMessage(target_div, 'Manifest Error', 'The manifest you supplied contains no sequence so there are no images to show.');
-    }
+           target_div.appendChild(canvasDiv);
+       }
+   } else {
+       showMessage(target_div, 'Manifest Error', 'The manifest you supplied contains no sequence so there are no images to show.');
+   }
 
 }
 
