@@ -5,6 +5,7 @@ function loadManifest(event) {
 }    
 
 function fetchManifest() {    
+    document.getElementById("loading").style.display = "block";
     let manifest_uri = document.getElementById('manifest_uri').value;
     
     let target_div = document.getElementById('manifest_content');
@@ -21,21 +22,27 @@ function fetchManifest() {
           .then(data => {
             if ("@type" in data) {
                 if (data["@type"] != 'sc:Manifest') {
+                    document.getElementById("loading").style.display = "none";
                     showMessage(target_div, 'Manifest Format Error', 'The JSON for this Manifest doesnt look like a Manifest. It should have either a @type of sc:Manifest but has a type of: ' + data["@type"]);
                 } else {
                     loadv2(data, target_div);
+                    document.getElementById("loading").style.display = "none";
                 }
             } else if ("type" in data) {
                 if (data["type"] != 'Manifest') {
+                    document.getElementById("loading").style.display = "none";
                     showMessage(target_div, 'Manifest Format Error', 'The JSON for this Manifest doesnt look like a Manifest. It should have either a type of Manifest but has a type of: ' + data["type"]);
                 } else {
                     loadv3(data, target_div);
+                    document.getElementById("loading").style.display = "none";
                 }
             } else {
+                document.getElementById("loading").style.display = "none";
                 showMessage(target_div, 'Manifest Format Error', 'The JSON for this Manifest doesnt look like a Manifest. It should have either a @type or type value of Manifest');
             }
           })
           .catch(error => {
+                document.getElementById("loading").style.display = "none";
                 showMessage(target_div, 'Manifest retrieval error', 'I was unable to get the Manifest you supplied due to: ' + error);
           });
                 
