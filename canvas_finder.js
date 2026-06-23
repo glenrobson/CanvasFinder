@@ -286,7 +286,10 @@ function loadv3(manifest, target_div) {
 }
 
 function manifestOK(manifest_uri, target_div) {
-    if (manifest_uri.startsWith('http://')) {
+    if (manifest_uri.startsWith('http://') && 
+            !manifest_uri.startsWith('http://localhost') && 
+            !manifest_uri.startsWith('http://127.0.0.1') && 
+            !manifest_uri.startsWith('http://0.0.0.0')) {
         showMessage(target_div, 'http/https issue', 'The manifest link you supplied is a http link. To use this tool you need to supply a link that starts with https. This is a common problem you come across with IIIF. If the webpage you are using is https then the Manifest link must also start with https. The training site and most modern websites uses https which is a secure way of accessing the web.');
 
         return false;
