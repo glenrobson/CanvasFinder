@@ -146,7 +146,7 @@ function loadv2(manifest, target_div) {
                     let label = document.createElement('p');
                     label.innerHTML = '<b>Page Label: </b>' + canvas.label;
 
-                    if canvas.images {
+                    if (canvas.images) {
                         var iiifURL = canvas.images[0].resource.service["@id"];
 
                         let link = document.createElement('a');
