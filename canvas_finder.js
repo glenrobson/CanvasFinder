@@ -146,25 +146,32 @@ function loadv2(manifest, target_div) {
                     let label = document.createElement('p');
                     label.innerHTML = '<b>Page Label: </b>' + canvas.label;
 
-                    var iiifURL = canvas.images[0].resource.service["@id"];
+                    if canvas.images {
+                        var iiifURL = canvas.images[0].resource.service["@id"];
 
-                    let link = document.createElement('a');
-                    link.href = iiifURL;
-                    link.innerHTML = iiifURL;
+                        let link = document.createElement('a');
+                        link.href = iiifURL;
+                        link.innerHTML = iiifURL;
 
-                    let pLink = document.createElement('p');
-                    pLink.innerHTML = '<b>IIIF Image URL: </b><br/>';
-                    pLink.appendChild(link);
+                        let pLink = document.createElement('p');
+                        pLink.innerHTML = '<b>IIIF Image URL: </b><br/>';
+                        pLink.appendChild(link);
 
-                    let button = document.createElement('button');
-                    button.style = "cursor: pointer; background-color: #0069d9; color: #fff; border-color: #0062cc; font-weight: 400; text-align: center; vertical-align: middle; user-select: none; border: 1px solid transparent; padding: .375rem .75rem; line-height: 1.5; border-radius: .25rem; transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; -webkit-appearance: button;text-transform: none; overflow: visible; margin: 0; font-family: inherit;box-sizing: border-box; ";
-                    button.innerHTML = '<i class="fas fa-copy"></i> Copy Image URL';       
-                    button.addEventListener('click', copyURL);
-                    button.dataset.link = link;
+                        let button = document.createElement('button');
+                        button.style = "cursor: pointer; background-color: #0069d9; color: #fff; border-color: #0062cc; font-weight: 400; text-align: center; vertical-align: middle; user-select: none; border: 1px solid transparent; padding: .375rem .75rem; line-height: 1.5; border-radius: .25rem; transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; -webkit-appearance: button;text-transform: none; overflow: visible; margin: 0; font-family: inherit;box-sizing: border-box; ";
+                        button.innerHTML = '<i class="fas fa-copy"></i> Copy Image URL';       
+                        button.addEventListener('click', copyURL);
+                        button.dataset.link = link;
+
+                        contentDiv.appendChild(pLink);
+                        contentDiv.appendChild(button);
+                    } else {
+                        let pLink = document.createElement('p');
+                        pLink.innerHTML = "NO IMAGE";
+                        contentDiv.appendChild(pLink);
+                    }
 
                     contentDiv.appendChild(label);
-                    contentDiv.appendChild(pLink);
-                    contentDiv.appendChild(button);
                     canvasDiv.appendChild(thumbDiv);
                     canvasDiv.appendChild(contentDiv);
 
