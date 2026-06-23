@@ -1,6 +1,10 @@
 
 function loadManifest(event) {
     event.preventDefault();
+    fetchManifest();
+}    
+
+function fetchManifest() {    
     let manifest_uri = document.getElementById('manifest_uri').value;
     
     let target_div = document.getElementById('manifest_content');
@@ -134,19 +138,19 @@ function loadv2(manifest, target_div) {
                     canvasDiv.className = 'canvasDiv';
                     canvasDiv.dataset.label = canvas.label;
 
-                    let thumbnail = document.createElement('img');
-                    thumbnail.src = getCanvasThumbnail(canvas, 150,150);
-                    thumbnail.className = 'thumbnail';
-                    let thumbDiv = document.createElement('div');
-                    thumbDiv.style="display: inline-block;";
-                    thumbDiv.appendChild(thumbnail);
-
                     let contentDiv = document.createElement('div');
                     contentDiv.style="width: 70%; display: inline-block;position: relative; padding-left: 20px;"
                     let label = document.createElement('p');
                     label.innerHTML = '<b>Page Label: </b>' + canvas.label;
 
                     if (canvas.images) {
+                        let thumbnail = document.createElement('img');
+                        thumbnail.src = getCanvasThumbnail(canvas, 150,150);
+                        thumbnail.className = 'thumbnail';
+                        let thumbDiv = document.createElement('div');
+                        thumbDiv.style="display: inline-block;";
+                        thumbDiv.appendChild(thumbnail);
+
                         var iiifURL = canvas.images[0].resource.service["@id"];
 
                         let link = document.createElement('a');
@@ -165,14 +169,15 @@ function loadv2(manifest, target_div) {
 
                         contentDiv.appendChild(pLink);
                         contentDiv.appendChild(button);
+                        canvasDiv.appendChild(thumbDiv);
                     } else {
+                        console.log('No image for ' + canvas['@id'] + ": " + canvas['label']);
                         let pLink = document.createElement('p');
                         pLink.innerHTML = "NO IMAGE";
                         contentDiv.appendChild(pLink);
                     }
 
                     contentDiv.appendChild(label);
-                    canvasDiv.appendChild(thumbDiv);
                     canvasDiv.appendChild(contentDiv);
 
                     target_div.appendChild(canvasDiv);
@@ -394,3 +399,12 @@ function showMessage(div, title, message) {
     div.appendChild(p);
     
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const match = window.location.search.match(/[?&]iiif-content=([^&]*)/);
+    if (match) {
+        const iiifContent = match[1];
+        document.getElementById("manifest_uri").value = iiifContent;
+        fetchManifest();
+    }
+});
